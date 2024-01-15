@@ -3,7 +3,12 @@ package com.shop.models
 case class AgeInterval(
                         start: Int,
                         end: Int,
-                      )
+                      ) {
+  override def toString: String = end match {
+    case Int.MaxValue => s">${start - 1} months"
+    case _ => s"$start-${end} months"
+  }
+}
 
 case class OrderGroup(
                        interval: AgeInterval,
@@ -11,6 +16,7 @@ case class OrderGroup(
                      ) {
 
   def printResult(): Unit = {
-    println(s"${interval.start}-${interval.end} months: ${count} orders")
+    println(s"${interval.toString}: $count orders")
   }
+
 }
