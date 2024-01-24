@@ -1,4 +1,4 @@
-name := "shop"
+name := "shop-statistics"
 
 version := "1.0"
 
@@ -22,5 +22,5 @@ scalacOptions ++= Seq(
 
 lazy val root = (project in file("."))
   .settings(
-    name := "shop"
+    name := "shop-statistics"
   )

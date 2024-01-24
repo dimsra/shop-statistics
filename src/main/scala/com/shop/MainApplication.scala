@@ -8,11 +8,10 @@ import slick.jdbc.JdbcBackend.Database
 import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
-object MainApplication extends App {import com.typesafe.config.ConfigFactory
+object MainApplication extends App {
 
-  lazy val db: Database = Database.forConfig("slick.dbs.default")
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-
+  lazy val db: Database = Database.forConfig("slick.dbs.default")
   lazy val orderRepository = new OrderRepository(db)
   lazy val orderProcessor = new OrderProcessor(orderRepository)
 
@@ -21,6 +20,7 @@ object MainApplication extends App {import com.typesafe.config.ConfigFactory
   val result: Future[Seq[OrderGroup]] = orderProcessor.processOrders(startDateTime, endDateTime, ageIntervals)
   result.onComplete {
     case scala.util.Success(intervalCounts) =>
+      println()
       intervalCounts.foreach(_.printResult())
       db.close()
 
@@ -28,16 +28,15 @@ object MainApplication extends App {import com.typesafe.config.ConfigFactory
       println(s"An error occurred: $exception")
       db.close()
   }
-  //  scala.io.StdIn.readLine()
 
 
-  private def parseCommandLineArgs(args: Array[String]): (LocalDateTime, LocalDateTime, Seq[AgeInterval]) = {
+  private def parseCommandLineArgs(args: Seq[String]): (LocalDateTime, LocalDateTime, Seq[AgeInterval]) = {
     if (args.length < 3) {
       println("Usage: MainApplication <startDateTime> <endDateTime> <interval1Start-interval1End> <interval2Start-interval2End> ...")
       System.exit(1)
     }
 
-    val startDateTime = LocalDateTime.parse(args(0))
+    val startDateTime = LocalDateTime.parse(args.head)
     val endDateTime = LocalDateTime.parse(args(1))
     val intervalArgs = args.drop(2).flatMap(parseInterval)
     (startDateTime, endDateTime, intervalArgs)
